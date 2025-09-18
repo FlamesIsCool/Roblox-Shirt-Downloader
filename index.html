@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RBX Shirt Pro — Premium Downloader</title>
+  <meta name="description" content="A premium, ultra-polished Roblox shirt downloader with live preview, animations, and one‑click download. Paste a shirt ID or URL and go."/>
+  <meta name="theme-color" content="#0f172a"/>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg width='128' height='128' viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300a2ff'/%3E%3Cstop offset='1' stop-color='%2300ff9d'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect rx='28' ry='28' width='128' height='128' fill='%230b0f1a'/%3E%3Cpath d='M32 64l24-24 40 40-24 24z' fill='url(%23g)'/%3E%3Ccircle cx='64' cy='64' r='10' fill='%23fff' opacity='.15'/%3E%3C/svg%3E"/>
+
+  <style>
+    :root{
+      --bg-1:#0b0f1a; --bg-2:#0a1324; --bg-3:#001b3b;
+      --glass: rgba(255,255,255,.08);
+      --card: rgba(14,18,32,.55);
+      --txt:#e6f0ff; --muted:#9fb5d1;
+      --pri:#00a2ff; --sec:#00ff9d; --warn:#ff6b6b;
+      --ring: rgba(0,162,255,.5);
+      --shadow: 0 20px 60px rgba(0,0,0,.45), 0 10px 30px rgba(0,162,255,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--txt); background: radial-gradient(1200px 800px at 10% -10%, #0e274e 0%, transparent 60%),
+      radial-gradient(1000px 700px at 110% 0%, #08213d 0%, transparent 50%),
+      linear-gradient(120deg, var(--bg-1), var(--bg-2) 40%, var(--bg-3) 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      overflow-x:hidden;
+    }
+    .aurora{
+      position:fixed; inset:-20% -20% auto -20%; height:70vh; pointer-events:none; filter: blur(60px) saturate(140%);
+      background: conic-gradient(from 180deg at 50% 50%, rgba(0,162,255,.28), rgba(0,255,157,.18), rgba(0,162,255,.28));
+      mix-blend-mode: screen; opacity:.45; animation:float 14s ease-in-out infinite alternate;
+    }
+    @keyframes float{
+      0%{transform:translateY(-2%) scale(1)}
+      100%{transform:translateY(4%) scale(1.05)}
+    }
+    header{
+      position:sticky; top:0; z-index:20; backdrop-filter: blur(10px);
+      background:linear-gradient(to bottom, rgba(8,12,24,.8), rgba(8,12,24,.35));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .wrap{max-width:1040px; margin:0 auto; padding:18px 20px; display:flex; gap:16px; align-items:center; justify-content:space-between;}
+    .brand{display:flex; gap:12px; align-items:center; text-decoration:none; color:var(--txt)}
+    .logo{
+      width:34px; height:34px; border-radius:9px; display:grid; place-items:center;
+      background:linear-gradient(135deg, rgba(0,162,255,.25), rgba(0,255,157,.18));
+      border:1px solid rgba(255,255,255,.08); box-shadow: inset 0 1px 8px rgba(255,255,255,.05), 0 10px 25px rgba(0,162,255,.15);
+    }
+    .brand span{font-weight:800; letter-spacing:.4px}
+    .gh{opacity:.75; transition:.2s; text-decoration:none; color:var(--muted); border:1px solid rgba(255,255,255,.08); padding:8px 12px; border-radius:10px}
+    .gh:hover{opacity:1; border-color:rgba(255,255,255,.14)}
+
+    .hero{position:relative; padding:70px 20px 22px}
+    .hero h1{
+      margin:0 auto 14px; max-width:900px; text-align:center; font-size:min(9vw, 64px); line-height:1.04;
+      font-weight:900; letter-spacing:.3px;
+      background:linear-gradient(90deg, #77d8ff, #fff, #84ffd0);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow: 0 0 30px rgba(0,162,255,.25);
+    }
+    .hero p{
+      text-align:center; color:var(--muted); font-size: clamp(15px, 2vw, 18px); margin:0 auto; max-width:720px
+    }
+
+    .card{
+      margin:30px auto 0; max-width:880px; background:var(--card);
+      border:1px solid rgba(255,255,255,.07); border-radius:22px; box-shadow:var(--shadow);
+      overflow:hidden; position:relative;
+    }
+    .card::before{
+      content:""; position:absolute; inset:0 -40% -60% -40%; background:
+        radial-gradient(600px 150px at 20% 0%, rgba(0,162,255,.15), transparent 70%),
+        radial-gradient(800px 200px at 80% 0%, rgba(0,255,157,.12), transparent 70%);
+      pointer-events:none;
+    }
+    .card-inner{display:grid; grid-template-columns: 1.2fr 1fr; gap:0; min-height:420px}
+    @media (max-width: 860px){ .card-inner{grid-template-columns:1fr; min-height:unset}}
+    .left{
+      padding:26px; display:flex; flex-direction:column; gap:16px; border-right:1px solid rgba(255,255,255,.06);
+    }
+    .label{font-weight:700; letter-spacing:.3px; color:#cfe6ff}
+    .input-wrap{
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+      border-radius:14px; display:flex; align-items:center; padding:8px; gap:10px;
+    }
+    .input-wrap input{
+      background:transparent; color:var(--txt); border:0; outline:0; width:100%; font-size:15px; padding:10px 12px;
+    }
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:0; border-radius:12px; background:linear-gradient(135deg, var(--pri), #39d2ff);
+      color:#04121f; font-weight:800; padding:12px 16px; cursor:pointer; box-shadow: 0 10px 22px rgba(0,162,255,.28);
+      transition: transform .15s ease, box-shadow .2s ease, filter .2s ease; display:inline-flex; align-items:center; gap:10px;
+    }
+    .btn:hover{transform: translateY(-1.5px); box-shadow: 0 16px 30px rgba(0,162,255,.4)}
+    .btn.secondary{
+      background:linear-gradient(135deg, #0f2a42, #0a1e31); color:#bfe7ff; border:1px solid rgba(255,255,255,.08); box-shadow:none;
+    }
+    .hint{color:var(--muted); font-size:13px}
+    .right{position:relative; display:grid; place-items:center; padding:22px}
+    .preview{
+      width:100%; height:100%; min-height:320px; display:grid; place-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius:16px; border:1px dashed rgba(255,255,255,.14); position:relative; overflow:hidden;
+    }
+    .skeleton{
+      --sh:#0e3556;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.06) 50%, rgba(255,255,255,0) 100%);
+      background-size: 280% 100%; animation: shimmer 1.4s infinite;
+      position:absolute; inset:0;
+    }
+    @keyframes shimmer{ 0%{background-position:-180% 0} 100%{background-position:180% 0} }
+    .preview img{
+      max-width:min(92%,520px); max-height:360px; border-radius:14px; box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      transition: transform .25s ease;
+    }
+    .preview img:hover{ transform: scale(1.015) }
+    .empty{
+      color:#6fa8cf; text-align:center; display:grid; gap:10px; place-items:center; padding:20px
+    }
+    .empty svg{opacity:.55}
+
+    .steps{max-width:1040px; margin:60px auto 20px; padding: 0 20px}
+    .steps h2{font-size: clamp(22px, 3vw, 28px); margin:0 0 14px}
+    .grid{
+      display:grid; grid-template-columns: repeat(3,1fr); gap:16px;
+    }
+    @media (max-width: 860px){ .grid{grid-template-columns: 1fr} }
+    .step{
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:18px;
+    }
+    .step h3{margin:0 0 6px; font-size:18px}
+    .toast{
+      position: fixed; right:16px; bottom:16px; background: rgba(8,14,26,.9); border:1px solid rgba(255,255,255,.07);
+      color:#dff3ff; padding:12px 14px; border-radius:12px; box-shadow: var(--shadow); display:none;
+    }
+    footer{color:#7eaad1; text-align:center; padding:40px 20px}
+    .ring{outline:3px solid var(--ring); outline-offset:2px; transition:.2s}
+  
+    .modal{position: fixed; inset:0; background: rgba(3,7,15,.85); display:none; place-items:center; z-index:50}
+    .modal img{max-width:94vw; max-height:85vh; border-radius:14px; box-shadow: 0 30px 90px rgba(0,0,0,.6)}
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#">
+        <div class="logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="url(#g)" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#00a2ff"/><stop offset="1" stop-color="#00ff9d"/></linearGradient></defs>
+            <rect x="4" y="4" width="16" height="16" rx="3" fill="url(#g)"/>
+          </svg>
+        </div>
+        <span>RBX Shirt Pro</span>
+      </a>
+      <a class="gh" href="#" onclick="alert('Tip: Press Enter to download. Paste full Roblox URL or just the numeric ID.'); return false;">Help</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Download Roblox Shirts <br/>with Ease</h1>
+    <p>Paste a Roblox <strong>shirt ID or catalog URL</strong>. Get an instant live preview, then download in one click — fast, clean, and gorgeous.</p>
+  </section>
+
+  <main class="card" aria-live="polite">
+    <div class="card-inner">
+      <div class="left">
+        <div class="label">Shirt ID or URL</div>
+        <div class="input-wrap" id="inputWrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#6fbef7" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12a9 9 0 1 1 18 0 9 9 0 0 1-18 0Zm9-7a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm.75 3.5a.75.75 0 0 1 .75.75v2.69l2.22 2.22a.75.75 0 1 1-1.06 1.06l-2.41-2.41a1.5 1.5 0 0 1-.44-1.06V9.25a.75.75 0 0 1 .75-.75Z"/></svg>
+          <input id="id-input" inputmode="numeric" placeholder="e.g. 476048861 or https://www.roblox.com/catalog/476048861/..." autocomplete="off" aria-label="Roblox shirt ID or URL"/>
+        </div>
+        <div class="btns">
+          <button class="btn" id="download-button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#04121f" xmlns="http://www.w3.org/2000/svg"><path d="M12 3a1 1 0 0 1 1 1v8.586l2.293-2.293a1 1 0 0 1 1.414 1.414l-4.004 4.003a1.1 1.1 0 0 1-1.406 0l-4.004-4.003A1 1 0 0 1 8.707 10.293L11 12.586V4a1 1 0 0 1 1-1ZM5 19a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1Z"/></svg>
+            Preview &amp; Download
+          </button>
+          <button class="btn secondary" id="copy-url">Copy Image URL</button>
+        </div>
+        <div class="hint">Pro tip: Press <kbd>Enter</kbd> to preview. We detect IDs inside full URLs automatically.</div>
+        <div id="status" class="hint"></div>
+      </div>
+
+      <div class="right">
+        <div class="preview" id="preview" role="figure" aria-label="Shirt preview">
+          <div class="empty" id="emptyState">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l3 3h4a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4l3-3zm0 2.414L10.414 7H6v10h12V7h-4.414L12 5.414zM12 9a3 3 0 1 1 .002 6.002A3 3 0 0 1 12 9z"/></svg>
+            <div>Live preview will appear here</div>
+          </div>
+          <div class="skeleton" id="skel" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="steps">
+    <h2>How it works</h2>
+    <div class="grid">
+      <div class="step"><h3>1) Paste</h3><p>Drop in a <em>shirt ID</em> or a full Roblox catalog URL. We’ll extract the numeric ID for you.</p></div>
+      <div class="step"><h3>2) Preview</h3><p>We fetch the asset info, resolve the actual <code>assetId</code>, and show a preview for the shirt.</p></div>
+      <div class="step"><h3>3) Download</h3><p>One‑click download via a safe blob URL. The file name auto‑matches the content type.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Built with ❤️ for Roblox creators. Not affiliated with Roblox.
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal" id="modal" tabindex="-1" aria-hidden="true"><img id="modalImg" alt="Zoomed preview"/></div>
+
+  <script>
+
+    const idInput = document.getElementById('id-input');
+    const downloadButton = document.getElementById('download-button');
+    const copyBtn = document.getElementById('copy-url');
+    const previewEl = document.getElementById('preview');
+    const emptyState = document.getElementById('emptyState');
+    const skel = document.getElementById('skel');
+    const toast = document.getElementById('toast');
+    const statusEl = document.getElementById('status');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+
+    function proxy(itemId) {
+      return `https://api.coolpixels.net/roblox/assetdelivery/${itemId}/info`;
+    }
+    function createDownloadUrl(assetId) {
+      return `https://api.coolpixels.net/roblox/assetdelivery/${assetId}`;
+    }
+
+    function showToast(msg, ok=true){
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      toast.style.borderColor = ok ? 'rgba(0,255,157,.35)' : 'rgba(255,107,107,.5)';
+      setTimeout(()=> toast.style.display = 'none', 2400);
+    }
+    function setStatus(msg){ statusEl.textContent = msg || ''; }
+
+    function parseItemId(input){
+      if(!input) return null;
+      const trimmed = String(input).trim();
+      const exactNum = trimmed.match(/^\d+$/);
+      if(exactNum) return exactNum[0];
+      try{
+        const u = new URL(trimmed);
+        const byQuery = u.searchParams.get('id');
+        if(byQuery && /^\d+$/.test(byQuery)) return byQuery;
+
+        const pathDigits = u.pathname.match(/\/(\d{3,})/);
+        if(pathDigits) return pathDigits[1];
+      }catch{}
+      const anyDigits = trimmed.match(/(\d{3,})/);
+      return anyDigits ? anyDigits[1] : null;
+    }
+
+    async function getAssetIdFromItemId(itemId) {
+      const url = proxy(itemId);
+      const resp = await fetch(url);
+      if(!resp.ok) throw new Error('Info request failed: '+resp.status);
+      const data = await resp.json();
+      const xmlText = data.content || '';
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+      let urlNode = xmlDoc.querySelector('roblox Item Properties Content url')
+                 || xmlDoc.querySelector('Content[url]') 
+                 || xmlDoc.querySelector('url');
+      if(!urlNode) throw new Error('Asset URL node not found.');
+      const urlValue = urlNode.textContent || urlNode.getAttribute('url') || '';
+      const eqIndex = urlValue.indexOf('=');
+      if(eqIndex === -1) throw new Error('Malformed asset URL.');
+      return urlValue.slice(eqIndex+1).trim();
+    }
+
+    async function blobify(originalUrl) {
+      const response = await fetch(originalUrl);
+      if(!response.ok) throw new Error('Asset fetch failed: '+response.status);
+      const type = response.headers.get('content-type') || 'image/png';
+      const data = await response.blob();
+      const blob = new Blob([data], { type });
+      return { href: URL.createObjectURL(blob), type };
+    }
+
+    function extFromType(type){
+      if(type.includes('png')) return 'png';
+      if(type.includes('jpeg') || type.includes('jpg')) return 'jpg';
+      if(type.includes('webp')) return 'webp';
+      return 'png';
+    }
+
+    function startLoading(){
+      emptyState.style.display = 'none';
+      skel.style.display = 'block';
+      previewEl.classList.add('ring');
+      setStatus('Fetching asset info…');
+    }
+    function stopLoading(){
+      skel.style.display = 'none';
+      previewEl.classList.remove('ring');
+      setStatus('');
+    }
+
+    function showPreview(src, alt){
+      const oldImg = previewEl.querySelector('img');
+      if(oldImg) oldImg.remove();
+      const img = document.createElement('img');
+      img.src = src; img.alt = alt || 'Shirt preview';
+      img.addEventListener('click', ()=> { modalImg.src = src; modal.style.display='grid'; modal.focus(); });
+      previewEl.appendChild(img);
+    }
+
+    async function handleDownloadFlow(){
+      try{
+        const inputVal = idInput.value;
+        const itemId = parseItemId(inputVal);
+        if(!itemId){ showToast('Enter a valid shirt ID or URL', false); idInput.focus(); return; }
+        startLoading();
+        const assetId = await getAssetIdFromItemId(itemId);
+        const directUrl = createDownloadUrl(assetId);
+
+        showPreview(directUrl, `Shirt ${assetId}`);
+
+        const blob = await blobify(directUrl);
+        stopLoading();
+
+        const a = document.createElement('a');
+        a.href = blob.href;
+        const ext = extFromType(blob.type);
+        a.download = `${assetId}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        showToast('Downloaded ✓');
+      }catch(err){
+        console.error(err);
+        stopLoading();
+        emptyState.style.display = 'grid';
+        showToast(String(err.message || err), false);
+        setStatus('Something went wrong. Try another ID.');
+      }
+    }
+
+    async function handleCopyUrl(){
+      const inputVal = idInput.value;
+      const itemId = parseItemId(inputVal);
+      if(!itemId){ showToast('Enter a valid ID or URL first', false); return; }
+      try{
+        startLoading();
+        const assetId = await getAssetIdFromItemId(itemId);
+        const direct = createDownloadUrl(assetId);
+        stopLoading(); showPreview(direct, `Shirt ${assetId}`);
+        await navigator.clipboard.writeText(direct);
+        showToast('Image URL copied');
+      }catch(err){
+        stopLoading();
+        showToast('Copy failed: '+(err.message||err), false);
+      }
+    }
+
+    downloadButton.addEventListener('click', handleDownloadFlow);
+    copyBtn.addEventListener('click', handleCopyUrl);
+    idInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') handleDownloadFlow(); });
+    modal.addEventListener('click', ()=>{ modal.style.display='none'; modalImg.src=''; });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') { modal.style.display='none'; modalImg.src=''; } });
+
+    const inputWrap = document.getElementById('inputWrap');
+    idInput.addEventListener('focus', ()=> inputWrap.classList.add('ring'));
+    idInput.addEventListener('blur', ()=> inputWrap.classList.remove('ring'));
+  </script>
+</body>
+</html>
